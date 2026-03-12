@@ -1,12 +1,26 @@
 import type {
   CryptoPulseConfig,
   WhaleMovement,
+  WhaleParams,
+  WhaleResponse,
   WalletInfo,
+  WalletParams,
   Chain,
+  ChainsResponse,
   MarketOverview,
+  DexSwap,
+  DexParams,
+  DexResponse,
   RoastResult,
   NarratorResult,
-  PaginatedResponse,
+  SmartMoneyScore,
+  BotStatus,
+  BotSignal,
+  BotSignalsResponse,
+  ApiKey,
+  GiveawayEntry,
+  GiveawayStatus,
+  ReferralInfo,
 } from './types';
 
 export * from './types';
@@ -19,7 +33,7 @@ export class CryptoPulse {
   constructor(config: CryptoPulseConfig = {}) {
     this.baseUrl = (config.baseUrl || 'https://cryptopulse.uno').replace(/\/$/, '');
     this.apiKey = config.apiKey;
-    this.timeout = config.timeout || 10000;
+    this.timeout = config.timeout || 15000;
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
@@ -49,32 +63,65 @@ export class CryptoPulse {
     }
   }
 
-  /** Get recent whale movements, optionally filtered by chain */
-  async getWhales(params?: { chain?: string; limit?: number; page?: number }): Promise<PaginatedResponse<WhaleMovement>> {
+  private qs(params: Record<string, any>): string {
     const q = new URLSearchParams();
-    if (params?.chain) q.set('chain', params.chain);
-    if (params?.limit) q.set('limit', String(params.limit));
-    if (params?.page) q.set('page', String(params.page));
-    const qs = q.toString();
-    return this.request(`/api/whales${qs ? `?${qs}` : ''}`);
+    for (const [k, v] of Object.entries(params)) {
+      if (v !== undefined && v !== null) q.set(k, String(v));
+    }
+    const s = q.toString();
+    return s ? `?${s}` : '';
   }
 
-  /** Look up a specific wallet */
-  async getWallet(address: string): Promise<WalletInfo> {
-    return this.request(`/api/wallet/${address}`);
+  // ═══════════════════════════════════════════════════════════
+  // 🐋 Whale Movements
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get recent whale movements across all chains or filtered by chain */
+  async getWhales(params?: WhaleParams): Promise<WhaleResponse> {
+    return this.request(`/api/whales${this.qs(params || {})}`);
   }
 
-  /** List all supported chains */
-  async getChains(): Promise<Chain[]> {
+  // ═══════════════════════════════════════════════════════════
+  // 🔍 Wallet Lookup
+  // ═══════════════════════════════════════════════════════════
+
+  /** Look up a wallet address — supports multichain scanning */
+  async getWallet(address: string, params?: WalletParams): Promise<WalletInfo> {
+    return this.request(`/api/wallet/${address}${this.qs(params || {})}`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // ⛓️ Chains
+  // ═══════════════════════════════════════════════════════════
+
+  /** List all supported blockchain networks */
+  async getChains(): Promise<ChainsResponse> {
     return this.request('/api/chains');
   }
 
-  /** Get market overview */
+  // ═══════════════════════════════════════════════════════════
+  // 📊 Market
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get market overview (market cap, volume, fear/greed, prices) */
   async getMarket(): Promise<MarketOverview> {
     return this.request('/api/market');
   }
 
-  /** AI-powered wallet roast */
+  // ═══════════════════════════════════════════════════════════
+  // 🔄 DEX
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get DEX swaps or trending tokens */
+  async getDex(params?: DexParams): Promise<DexResponse> {
+    return this.request(`/api/dex${this.qs(params || {})}`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 🤖 AI Features
+  // ═══════════════════════════════════════════════════════════
+
+  /** AI-powered wallet roast — get a humorous degen score */
   async roastWallet(address: string): Promise<RoastResult> {
     return this.request('/api/roast', {
       method: 'POST',
@@ -82,12 +129,78 @@ export class CryptoPulse {
     });
   }
 
-  /** AI narrator for wallet activity */
+  /** AI narrator — get a plain-English summary of wallet activity */
   async narrateWallet(address: string): Promise<NarratorResult> {
     return this.request('/api/narrator', {
       method: 'POST',
       body: JSON.stringify({ address }),
     });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 🧠 Smart Money
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get smart money score for a wallet */
+  async getSmartMoney(address: string): Promise<SmartMoneyScore> {
+    return this.request(`/api/smart-money${this.qs({ address })}`);
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 📈 Trading Bot
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get public bot performance status */
+  async getBotStatus(): Promise<BotStatus> {
+    return this.request('/api/bot/status');
+  }
+
+  /** Get trading signals (requires API key with Trader+ plan) */
+  async getBotSignals(): Promise<BotSignalsResponse> {
+    return this.request('/api/bot/signals');
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 🔑 API Keys
+  // ═══════════════════════════════════════════════════════════
+
+  /** List your API keys (requires authentication) */
+  async getApiKeys(): Promise<{ keys: ApiKey[] }> {
+    return this.request('/api/keys');
+  }
+
+  /** Create a new API key */
+  async createApiKey(name: string): Promise<ApiKey> {
+    return this.request('/api/keys', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 🎁 Giveaway
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get current giveaway status */
+  async getGiveaway(): Promise<GiveawayStatus> {
+    return this.request('/api/giveaway');
+  }
+
+  /** Enter a giveaway */
+  async enterGiveaway(wallet: string, email?: string, referralCode?: string): Promise<GiveawayEntry> {
+    return this.request('/api/giveaway', {
+      method: 'POST',
+      body: JSON.stringify({ wallet, email, referralCode }),
+    });
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // 🔗 Referral
+  // ═══════════════════════════════════════════════════════════
+
+  /** Get your referral info and stats */
+  async getReferral(): Promise<ReferralInfo> {
+    return this.request('/api/referral');
   }
 }
 

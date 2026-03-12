@@ -1,16 +1,26 @@
 {
   "name": "@cryptopulse/sdk",
-  "version": "1.0.0",
-  "description": "Official SDK for CryptoPulse — Real-time whale wallet tracker across 34+ EVM chains",
+  "version": "2.0.0",
+  "description": "Official TypeScript SDK for the CryptoPulse API \u2014 real-time whale tracking across 34+ EVM chains",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "module": "dist/index.mjs",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["crypto", "whale", "tracker", "evm", "blockchain", "defi", "web3"],
+  "keywords": [
+    "crypto",
+    "whale",
+    "tracker",
+    "evm",
+    "blockchain",
+    "defi",
+    "web3"
+  ],
   "author": "CryptoPulse <hello@cryptopulse.uno>",
   "license": "MIT",
   "homepage": "https://cryptopulse.uno",
