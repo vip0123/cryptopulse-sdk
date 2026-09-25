@@ -1,6 +1,6 @@
 # CryptoPulse SDK
 
-> Official TypeScript/JavaScript SDK for the [CryptoPulse](https://cryptopulse.uno) API — real-time whale tracking across 19 EVM chains.
+> Official TypeScript/JavaScript SDK for the [CryptoPulse](https://cryptopulse.uno) API — real-time whale tracking across 13 EVM chains.
 
 [![npm](https://img.shields.io/npm/v/@cryptopulse/sdk)](https://www.npmjs.com/package/@cryptopulse/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -33,7 +33,7 @@ console.log(wallet.label, wallet.smartMoneyScore);
 |--------|----------|-------------|
 | `getWhales(params?)` | `GET /api/whales` | Whale movements (chain, period, limit filters) |
 | `getWallet(address, params?)` | `GET /api/wallet/:address` | Wallet lookup with multichain support |
-| `getChains()` | `GET /api/chains` | List the configured chains (whale scanning covers 19 of them) |
+| `getChains()` | `GET /api/chains` | List the configured chains (whale scanning covers 13 of them) |
 | `getMarket()` | `GET /api/market` | Market overview (cap, volume, fear/greed) |
 | `getDex(params?)` | `GET /api/dex` | DEX swaps and trending tokens |
 | `roastWallet(address)` | `POST /api/roast` | AI-powered wallet roast with degen score |
