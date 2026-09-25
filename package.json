@@ -1,6 +1,6 @@
 {
   "name": "@cryptopulse/sdk",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "Official TypeScript SDK for the CryptoPulse API — real-time whale tracking across 13 EVM chains",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
